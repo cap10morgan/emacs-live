@@ -101,12 +101,8 @@
 ;; Store live base dirs, but respect user's choice of `live-root-dir'
 ;; when provided.
 (setq live-root-dir (if (boundp 'live-root-dir)
-                          (file-name-as-directory live-root-dir)
-                        (if (file-exists-p (expand-file-name "manifest.el" user-emacs-directory))
-                            user-emacs-directory)
-                        (file-name-directory (or
-                                              load-file-name
-                                              buffer-file-name))))
+                        (file-name-as-directory live-root-dir)
+                      user-emacs-directory))
 
 (setq
  live-tmp-dir      (file-name-as-directory (concat live-root-dir "tmp"))
@@ -135,15 +131,16 @@
 (load-file (concat live-lib-dir "live-core.el"))
 
 ;;default packs
-(let* ((pack-names '("foundation-pack"
-                     "colour-pack"
-                     "clojure-pack"
-                     "lang-pack"
-                     "power-pack"
-                     "git-pack"
-                     "org-pack"
-                     "bindings-pack"))
-       (live-dir (file-name-as-directory "live"))
+(setq pack-names '("foundation-pack"
+                   "colour-pack"
+                   "clojure-pack"
+                   "lang-pack"
+                   "power-pack"
+                   "git-pack"
+                   "org-pack"
+                   "bindings-pack"))
+
+(let* ((live-dir (file-name-as-directory "live"))
        (dev-dir  (file-name-as-directory "dev")))
   (setq live-packs (mapcar (lambda (p) (concat live-dir p)) pack-names) )
   (setq live-dev-pack-list (mapcar (lambda (p) (concat dev-dir p)) pack-names) ))
@@ -163,10 +160,44 @@
   (if (and (file-exists-p pack-file) (not live-safe-modep))
       (load-file pack-file)))
 
-;; Load all packs - Power Extreme!
-(mapcar (lambda (pack-dir)
-          (live-load-pack pack-dir))
-        (live-pack-dirs))
+;; setup package repos
+(require 'package)
+(add-to-list 'package-archives '("welpa" . "http://marty.timetraveltoaster.com/packages/"))
+(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
+(package-initialize)
+
+(defun bootstrapped-file-path ()
+  (concat (file-name-as-directory "~/.emacs.d") ".bootstrapped"))
+
+(defun install-live-packages ()
+  (message "Bootstrapping Emacs Live...")
+  (when (not package-archive-contents)
+    (package-refresh-contents))
+  (dolist (package (mapcar 'intern pack-names))
+    (unless (package-installed-p package)
+      (package-install package)))
+  (write-region "" "" (bootstrapped-file-path))
+  (message "Done."))
+
+;; Ensure live-packs are all installed on first run
+(if (file-exists-p (bootstrapped-file-path))
+    (message "Emacs Live has been bootstrapped; not installing live-packs")
+  (install-live-packages))
+
+;; Load live packs from packages
+(defun load-live-packages ()
+  (let* ((live-package-info-files
+          (file-expand-wildcards "~/.emacs.d/elpa/*/info.el"))
+         (live-package-dirs
+          (mapcar 'file-name-directory live-package-info-files)))
+    (mapc (lambda (live-package)
+            (live-load-pack live-package))
+          live-package-dirs)))
+
+(load-live-packages)
+
+;; Load live packages after init
+;;(add-hook 'after-init-hook 'load-live-packages)
 
 (setq live-welcome-messages
       (if (live-user-first-name-p)
