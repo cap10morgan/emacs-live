@@ -57,29 +57,15 @@ in battle against the evil friction of poor text editor workflows.
 
 Emacs Live is only compatible with Emacs 24 and above.
 
-### Easy Install
+### Install
 
-If you're the kind of shoot-from-the-hip brogrammer that doesn't mind
-executing random scripts from the interwebs, then the easiest way to
-install Emacs Live is to run the following which will safely preserve
-any Emacs configs you already have:
+Move any existing ~/.emacs.d directory out of the way, then...
 
-    bash <(curl -fksSL https://raw.github.com/overtone/emacs-live/master/installer/install-emacs-live.sh)
+`git clone git@github.com:cap10morgan/emacs-live.git ~/.emacs.d`
+`cd ~/.emacs.d`
+`git checkout -t origin/live-packages`
 
-Note: you should always read through random scripts before executing
-them!
-
-### Getting Started
-
-The (only ever-so-slightly) more involved way to install is to follow
-these steps:
-
-1. Move aside `~/.emacs`, `~/.emacs.el` or `~/.emacs.d` if they
-   currently exist.
-2. Download the zip bundle (or clone the repository with git) and move
-   and rename to `~/.emacs.d`
-3. Launch Emacs version 24+
-4. Live code your hat off!
+Launch Emacs and it will install the default set of packages.
 
 ### Clojure Hacking
 
@@ -108,9 +94,8 @@ Here's a video showing the config in use:
 ## Live Packs
 
 Emacs Live is powered by a number of special packs. Packs are
-directories which are used to store isolated sets of functionality and
-configuration. These may be symlinks or git submodules depending on how
-you choose to store and manage your dot emacs.
+regular Emacs packages which can be managed via M-x list-packages.
+They all end in "-pack".
 
 ### Pack Structure
 
