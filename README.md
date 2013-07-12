@@ -62,7 +62,9 @@ Emacs Live is only compatible with Emacs 24 and above.
 Move any existing ~/.emacs.d directory out of the way, then...
 
 `git clone git@github.com:cap10morgan/emacs-live.git ~/.emacs.d`
+
 `cd ~/.emacs.d`
+
 `git checkout -t origin/live-packages`
 
 Launch Emacs and it will install the default set of packages.
